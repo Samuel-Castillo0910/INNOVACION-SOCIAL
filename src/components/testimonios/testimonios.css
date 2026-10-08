@@ -1,0 +1,121 @@
+/* estilos de los testimonios y el foro, usan los mismos colores de index.css */
+
+/* foro */
+.foro-intro{max-width:600px;margin:-20px auto 32px}
+.aviso{display:flex;gap:10px;align-items:flex-start;font-size:.85rem;color:var(--b);border:1px dashed #22d3ee66;border-radius:12px;padding:12px 16px;margin-bottom:20px}
+.aviso svg{flex-shrink:0;margin-top:3px}
+
+.compositor{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;transition:.3s}
+.compositor:focus-within{border-color:#8b5cf688}
+.campo-alias{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.compositor input,.compositor textarea,.caja input,.caja textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);font:inherit;font-size:.95rem;padding:11px 13px;outline:0;transition:.2s}
+.compositor input:focus,.compositor textarea:focus,.caja input:focus,.caja textarea:focus{border-color:var(--a);box-shadow:0 0 0 3px #8b5cf622}
+.compositor textarea{min-height:130px;resize:vertical;line-height:1.55}
+.chips-titulo{font-size:.8rem;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:inherit;font-size:.8rem;padding:5px 13px;cursor:pointer;transition:.2s}
+.chip:hover{color:var(--text);border-color:#8b5cf688}
+.chip.on{color:var(--text);border-color:var(--a);background:#8b5cf626}
+.pregunta-guia{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;line-height:1.3;margin:2px 0 12px}
+.compositor-nota{display:flex;gap:8px;align-items:flex-start;font-size:.8rem;line-height:1.5;margin-top:12px}
+.compositor-nota svg{flex-shrink:0;margin-top:2px;color:var(--b)}
+.compositor-pie{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px}
+.contador{font-size:.75rem;font-variant-numeric:tabular-nums}
+.compositor .btn:disabled,.caja .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.mensaje{font-size:.88rem;margin-top:12px}
+.mensaje.ok{color:var(--b)}
+.mensaje.error{color:#f43f5e}
+
+.foro-barra{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin:32px 0 16px;font-size:.9rem}
+.orden{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px}
+.orden button{background:none;border:0;border-radius:999px;color:var(--muted);font:inherit;font-size:.8rem;padding:6px 14px;cursor:pointer;transition:.2s}
+.orden button.on{background:var(--card);color:var(--text)}
+.foro-lista{display:flex;flex-direction:column;gap:16px}
+.vacio{text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);padding:48px 24px}
+
+.publicacion{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;transition:border-color .3s}
+.publicacion:hover{border-color:#8b5cf655}
+.autor{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:.92rem;min-width:0}
+.autor b{font-weight:500;overflow-wrap:anywhere}
+.autor-datos{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.autor-datos .muted{font-size:.78rem}
+.autor.chico{font-size:.85rem;gap:8px}
+.autor.chico .muted{font-size:.78rem}
+.tema{margin-left:auto;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--b);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.avatar{--tono:270;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;color:#fff;font-size:.76rem;font-weight:500;letter-spacing:.02em;text-shadow:0 1px 2px #0006;background:linear-gradient(135deg,hsl(var(--tono) 70% 62%),hsl(calc(var(--tono) + 50) 65% 42%))}
+.avatar.chico{width:26px;height:26px;font-size:.6rem}
+
+.texto{margin:12px 0 2px}
+.texto p{white-space:pre-wrap;overflow-wrap:anywhere;color:#dcdce8}
+.ver-mas{background:none;border:0;padding:0;margin-top:4px;color:var(--a);font:inherit;font-size:.85rem;cursor:pointer}
+
+.acciones{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:10px 0 0 -8px}
+.accion{display:inline-flex;align-items:center;gap:6px;background:none;border:0;border-radius:8px;color:var(--muted);font:inherit;font-size:.82rem;padding:6px 8px;cursor:pointer;transition:.2s}
+.accion:hover{color:var(--text);background:#ffffff0a}
+.accion.activa{color:var(--text)}
+.accion.apoyo.activa{color:#c4b5fd}
+.accion.discreta{margin-left:auto;font-size:.75rem;opacity:.75}
+.accion:disabled{cursor:default;opacity:.45;background:none}
+.cuenta{font-variant-numeric:tabular-nums;color:var(--text);font-weight:500}
+.acciones.chicas{margin-top:4px}
+.acciones.chicas .accion{font-size:.78rem;padding:5px 8px}
+
+/* barra cerrada para empezar a escribir */
+.compositor-cerrado{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;color:var(--muted);font:inherit;font-size:.95rem;text-align:left;cursor:text;transition:.3s}
+.compositor-cerrado:hover{border-color:#8b5cf688}
+.falso-campo{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:10px 16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.compositor-cerrado .btn{cursor:pointer}
+.campo-titulo{margin-bottom:10px;font-family:'Cormorant Garamond',serif !important;font-size:1.25rem !important;font-weight:600}
+.botones{display:flex;gap:8px}
+
+/* imagen opcional */
+.adjuntar{margin-top:10px}
+.boton-imagen{margin-left:-8px;cursor:pointer}
+.boton-imagen:focus-within{outline:2px solid var(--a);outline-offset:2px}
+.oculto{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+.vista-previa{position:relative;display:inline-block;max-width:100%}
+.vista-previa img{display:block;max-width:100%;max-height:240px;border-radius:12px;border:1px solid var(--line)}
+.vista-previa button{position:absolute;top:8px;right:8px;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;border:0;background:#000b;color:#fff;cursor:pointer}
+.imagen{display:block;width:100%;margin:14px 0 4px;padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);cursor:zoom-in}
+.imagen img{display:block;width:100%;max-height:420px;object-fit:cover}
+.imagen.grande{cursor:zoom-out}
+.imagen.grande img{max-height:none;object-fit:contain}
+
+/* titulos y etiquetas de las publicaciones */
+.publicacion-titulo{font-size:1.55rem;margin:14px 0 0}
+.tema.formulario{color:#c4b5fd;border-color:#8b5cf655;background:#8b5cf614}
+.filtros{display:flex;flex-wrap:wrap;gap:8px}
+.cuenta-filtro{opacity:.6;font-variant-numeric:tabular-nums;margin-left:2px}
+.cargando{margin-bottom:12px}
+
+/* hilos de comentarios, la linea vertical baja desde el avatar como en reddit */
+.hilo{border-top:1px solid var(--line);margin-top:12px;padding-top:16px}
+.hilo>.muted.chico{font-size:.85rem;margin-top:14px}
+.caja{display:grid;gap:8px;margin-bottom:6px}
+.caja textarea{min-height:76px;resize:vertical;font-size:.92rem;line-height:1.5}
+.caja-pie{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.caja-pie input{flex:1;min-width:150px;max-width:240px;font-size:.84rem;padding:8px 11px;margin-right:auto}
+.ramas{list-style:none;margin:0;padding:0}
+.comentario{padding-top:16px}
+.comentario-cuerpo{margin-left:34px}
+.comentario-cuerpo .texto{margin:4px 0 0}
+.comentario-cuerpo .texto p{font-size:.93rem}
+.comentario-cuerpo .caja{margin-top:8px}
+.ramas.anidadas{margin-left:12px;padding-left:20px;border-left:2px solid var(--line)}
+.ramas.anidadas:hover{border-left-color:#8b5cf655}
+.ramas.planas{margin-left:0;padding-left:0;border-left:0}
+
+.ayuda{display:flex;gap:12px;align-items:flex-start;font-size:.85rem;line-height:1.55;color:var(--muted);border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:16px 18px;margin-top:44px}
+.ayuda svg{flex-shrink:0;margin-top:2px;color:var(--b)}
+.ayuda b{color:var(--text);font-weight:500}
+
+@media(max-width:600px){
+.publicacion,.compositor{padding:16px}
+.comentario-cuerpo{margin-left:0}
+.ramas.anidadas{margin-left:4px;padding-left:12px}
+.caja-pie input{max-width:none;flex-basis:100%}
+.tema{margin-left:48px}
+.compositor-cerrado .btn{display:none}
+.compositor-pie{flex-wrap:wrap}
+.accion.discreta .etq{display:none}
+}
