@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CornerDownRight, Flag } from 'lucide-react'
+import { CornerDownRight, Flag, Trash2 } from 'lucide-react'
 import { Avatar, Texto, CajaComentario } from './Partes'
 import { haceCuanto } from './util'
-import { listarComentarios, crearComentario } from '../../lib/foro'
+import { listarComentarios, crearComentario, borrarComentario } from '../../lib/foro'
+import { useSesion } from '../../lib/sesion'
 
 // a partir de este nivel las respuestas ya no se corren mas a la derecha
 const NIVEL_MAXIMO = 5
 
 // hilo de comentarios de una publicacion, como en reddit cada comentario puede tener respuestas
+// onComentario recibe cuantos comentarios se sumaron o se quitaron
 export default function Hilo({ publicacionId, onComentario, reportados, onReportar }) {
+  const { usuario } = useSesion()
   const [comentarios, setComentarios] = useState([])
   const [estado, setEstado] = useState('cargando')
 
@@ -37,19 +40,32 @@ export default function Hilo({ publicacionId, onComentario, reportados, onReport
     return grupos
   }, [comentarios])
 
-  const responder = async ({ padreId, alias, texto }) => {
-    const nuevo = await crearComentario({ publicacionId, padreId, alias, texto })
+  const responder = async ({ padreId, texto }) => {
+    const nuevo = await crearComentario({ usuario, publicacionId, padreId, texto })
     setComentarios((lista) => [...lista, nuevo])
-    onComentario?.()
+    onComentario?.(1)
   }
+
+  // borra el comentario y todas sus respuestas
+  const borrar = async (id) => {
+    if (!window.confirm('¿Borrar este comentario y sus respuestas? No se puede deshacer.')) return
+    const fuera = new Set([id])
+    const juntar = (padre) => (ramas[padre] || []).forEach((h) => { fuera.add(h.id); juntar(h.id) })
+    juntar(id)
+    try {
+      await borrarComentario(id)
+      setComentarios((lista) => lista.filter((c) => !fuera.has(c.id)))
+      onComentario?.(-fuera.size)
+    } catch (error) {
+      window.alert(error.message || 'No se pudo borrar.')
+    }
+  }
+
+  const comunes = { ramas, responder, borrar, usuario, reportados, onReportar }
 
   return (
     <div className="hilo">
-      <CajaComentario
-        placeholder="Escribe un comentario…"
-        textoBoton="Comentar"
-        onEnviar={(alias, texto) => responder({ padreId: null, alias, texto })}
-      />
+      <CajaComentario placeholder="Escribe un comentario…" textoBoton="Comentar" onEnviar={(texto) => responder({ padreId: null, texto })} />
 
       {estado === 'cargando' && <p className="muted chico">Cargando comentarios…</p>}
       {estado === 'error' && <p className="mensaje error">No se pudieron cargar los comentarios.</p>}
@@ -58,7 +74,7 @@ export default function Hilo({ publicacionId, onComentario, reportados, onReport
       {ramas.raiz && (
         <ul className="ramas">
           {ramas.raiz.map((c) => (
-            <Comentario key={c.id} c={c} ramas={ramas} nivel={1} responder={responder} reportados={reportados} onReportar={onReportar} />
+            <Comentario key={c.id} c={c} nivel={1} {...comunes} />
           ))}
         </ul>
       )}
@@ -66,11 +82,12 @@ export default function Hilo({ publicacionId, onComentario, reportados, onReport
   )
 }
 
-function Comentario({ c, ramas, nivel, responder, reportados, onReportar }) {
+function Comentario({ c, nivel, ramas, responder, borrar, usuario, reportados, onReportar }) {
   const [respondiendo, setRespondiendo] = useState(false)
   const [plegado, setPlegado] = useState(false)
   const hijos = ramas[c.id] || []
   const reportado = reportados.has(c.id)
+  const mio = usuario && c.user_id === usuario.id
 
   return (
     <li className="comentario">
@@ -91,9 +108,15 @@ function Comentario({ c, ramas, nivel, responder, reportados, onReportar }) {
               {plegado ? `Ver ${hijos.length} ${hijos.length === 1 ? 'respuesta' : 'respuestas'}` : 'Ocultar respuestas'}
             </button>
           )}
-          <button type="button" className="accion discreta" onClick={() => onReportar('comentario', c.id)} disabled={reportado} aria-label={reportado ? 'Reportado' : 'Reportar'}>
-            <Flag size={13} /> <span className="etq">{reportado ? 'Reportado' : 'Reportar'}</span>
-          </button>
+          {mio ? (
+            <button type="button" className="accion discreta" onClick={() => borrar(c.id)} aria-label="Borrar">
+              <Trash2 size={13} /> <span className="etq">Borrar</span>
+            </button>
+          ) : (
+            <button type="button" className="accion discreta" onClick={() => onReportar('comentario', c.id)} disabled={reportado} aria-label={reportado ? 'Reportado' : 'Reportar'}>
+              <Flag size={13} /> <span className="etq">{reportado ? 'Reportado' : 'Reportar'}</span>
+            </button>
+          )}
         </div>
 
         {respondiendo && (
@@ -101,8 +124,8 @@ function Comentario({ c, ramas, nivel, responder, reportados, onReportar }) {
             autoFocus
             placeholder={`Responder a ${c.alias}…`}
             onCancelar={() => setRespondiendo(false)}
-            onEnviar={async (alias, texto) => {
-              await responder({ padreId: c.id, alias, texto })
+            onEnviar={async (texto) => {
+              await responder({ padreId: c.id, texto })
               setRespondiendo(false)
               setPlegado(false)
             }}
@@ -113,7 +136,7 @@ function Comentario({ c, ramas, nivel, responder, reportados, onReportar }) {
       {hijos.length > 0 && !plegado && (
         <ul className={'ramas anidadas' + (nivel >= NIVEL_MAXIMO ? ' planas' : '')}>
           {hijos.map((h) => (
-            <Comentario key={h.id} c={h} ramas={ramas} nivel={nivel + 1} responder={responder} reportados={reportados} onReportar={onReportar} />
+            <Comentario key={h.id} c={h} nivel={nivel + 1} ramas={ramas} responder={responder} borrar={borrar} usuario={usuario} reportados={reportados} onReportar={onReportar} />
           ))}
         </ul>
       )}

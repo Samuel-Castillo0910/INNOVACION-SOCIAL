@@ -6,8 +6,8 @@ export const Img = ({ h = 240 }) => (
   <div className="img" style={{ minHeight: h }}>IMAGEN PUEDE IR AQUI</div>
 )
 
-export const Foto = ({ src, alt, alto }) => (
-  <img className={'foto' + (alto ? ' alto' : '')} src={src} alt={alt} loading="lazy" />
+export const Foto = ({ src, alt, alto, clase }) => (
+  <img className={'foto' + (alto ? ' alto' : '') + (clase ? ' ' + clase : '')} src={src} alt={alt} loading="lazy" />
 )
 
 export const Reveal = ({ children, delay = 0, className }) => (
@@ -34,7 +34,7 @@ export const PageHero = ({ eyebrow, title, lead }) => (
     <motion.div className="wrap" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
       <p className="eyebrow">{eyebrow}</p>
       <h1>{title}</h1>
-      {lead !== null && <p className="muted lead">{lead ?? T}</p>}
+      {lead && <p className="muted lead">{lead}</p>}
     </motion.div>
   </header>
 )

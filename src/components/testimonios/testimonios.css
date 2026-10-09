@@ -65,6 +65,14 @@
 .compositor-cerrado:hover{border-color:#8b5cf688}
 .falso-campo{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:10px 16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .compositor-cerrado .btn{cursor:pointer}
+.campo-alias span{font-size:.9rem;color:var(--muted)}
+.campo-alias b{color:var(--text);font-weight:500}
+.sin-cuenta{cursor:default}
+.sin-cuenta .falso-campo{white-space:normal}
+.caja-entrar{font-size:.88rem;color:var(--muted);margin:4px 0 6px}
+.caja-entrar a{color:var(--a)}
+.caja-entrar .ver-mas{margin-left:10px}
+.como{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);margin-right:auto}
 .campo-titulo{margin-bottom:10px;font-family:'Cormorant Garamond',serif !important;font-size:1.25rem !important;font-weight:600}
 .botones{display:flex;gap:8px}
 
@@ -115,7 +123,9 @@
 .ramas.anidadas{margin-left:4px;padding-left:12px}
 .caja-pie input{max-width:none;flex-basis:100%}
 .tema{margin-left:48px}
-.compositor-cerrado .btn{display:none}
+.compositor-cerrado:not(.sin-cuenta) .btn{display:none}
+.sin-cuenta{flex-wrap:wrap}
+.sin-cuenta .falso-campo{flex-basis:calc(100% - 60px)}
 .compositor-pie{flex-wrap:wrap}
 .accion.discreta .etq{display:none}
 }

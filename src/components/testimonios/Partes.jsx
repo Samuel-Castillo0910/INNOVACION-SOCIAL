@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Heart, MessageCircle, Flag, Send } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Heart, MessageCircle, Flag, Send, Trash2 } from 'lucide-react'
 import { iniciales, colorDe } from './util'
-import { leerAlias, guardarAlias, MAX_ALIAS, MAX_COMENTARIO } from '../../lib/foro'
+import { MAX_COMENTARIO } from '../../lib/foro'
+import { useSesion } from '../../lib/sesion'
 
 // circulo con las iniciales del seudonimo
-export function Avatar({ alias, chico }) {
+export function Avatar({ alias, chico, tono }) {
   return (
-    <span className={'avatar' + (chico ? ' chico' : '')} style={{ '--tono': colorDe(alias) }} aria-hidden="true">
+    <span className={'avatar' + (chico ? ' chico' : '')} style={{ '--tono': tono ?? colorDe(alias) }} aria-hidden="true">
       {iniciales(alias)}
     </span>
   )
@@ -38,8 +40,8 @@ export function Texto({ texto, limite = 700 }) {
   )
 }
 
-// botones de abajo de cada publicacion, me identifico, respuestas y reportar
-export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto, onComentarios, reportado, onReportar }) {
+// botones de abajo de cada publicacion, me identifico, respuestas, borrar y reportar
+export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto, onComentarios, reportado, onReportar, onBorrar }) {
   const textoComentarios = comentarios === 0 ? 'Responder' : comentarios === 1 ? '1 respuesta' : `${comentarios} respuestas`
   return (
     <div className="acciones">
@@ -50,8 +52,13 @@ export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto,
       <button type="button" className={'accion' + (abierto ? ' activa' : '')} onClick={onComentarios} aria-expanded={abierto}>
         <MessageCircle size={16} /> {textoComentarios}
       </button>
+      {onBorrar && (
+        <button type="button" className="accion discreta" onClick={onBorrar} aria-label="Borrar">
+          <Trash2 size={14} /> <span className="etq">Borrar</span>
+        </button>
+      )}
       {onReportar && (
-        <button type="button" className="accion discreta" onClick={onReportar} disabled={reportado} aria-label={reportado ? 'Reportado' : 'Reportar'}>
+        <button type="button" className={'accion' + (onBorrar ? '' : ' discreta')} onClick={onReportar} disabled={reportado} aria-label={reportado ? 'Reportado' : 'Reportar'}>
           <Flag size={14} /> <span className="etq">{reportado ? 'Reportado' : 'Reportar'}</span>
         </button>
       )}
@@ -59,12 +66,26 @@ export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto,
   )
 }
 
-// cajita para comentar o responder, recuerda el ultimo seudonimo que se uso
+// cajita para comentar o responder, sin cuenta invita a entrar
 export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton = 'Responder', autoFocus }) {
-  const [alias, setAlias] = useState(leerAlias)
+  const { usuario } = useSesion()
   const [texto, setTexto] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
+
+  if (!usuario) {
+    return (
+      <p className="caja-entrar">
+        Para comentar, <Link to="/login" state={{ volver: '/blog#testimonials' }}>entra a tu cuenta</Link> o{' '}
+        <Link to="/register" state={{ volver: '/blog#testimonials' }}>crea una</Link> con un seudónimo.
+        {onCancelar && (
+          <button type="button" className="ver-mas" onClick={onCancelar}>
+            Cancelar
+          </button>
+        )}
+      </p>
+    )
+  }
 
   const enviar = async (e) => {
     e.preventDefault()
@@ -72,8 +93,7 @@ export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton =
     setEnviando(true)
     setError('')
     try {
-      await onEnviar(alias, texto)
-      guardarAlias(alias)
+      await onEnviar(texto)
       setTexto('')
     } catch {
       setError('No se pudo enviar, intenta de nuevo.')
@@ -94,13 +114,9 @@ export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton =
         aria-label={placeholder}
       />
       <div className="caja-pie">
-        <input
-          value={alias}
-          onChange={(e) => setAlias(e.target.value)}
-          placeholder="Seudónimo (opcional)"
-          maxLength={MAX_ALIAS}
-          aria-label="Seudónimo"
-        />
+        <span className="como">
+          <Avatar alias={usuario.seudonimo} chico /> {usuario.seudonimo}
+        </span>
         {onCancelar && (
           <button type="button" className="btn small" onClick={onCancelar}>
             Cancelar

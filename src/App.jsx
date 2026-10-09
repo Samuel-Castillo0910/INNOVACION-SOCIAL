@@ -6,6 +6,7 @@ import Blog from './pages/Blog'
 import Privacy from './pages/Privacy'
 import Mission from './pages/Mission'
 import Auth from './pages/Auth'
+import { useSesion, salir } from './lib/sesion'
 
 function ScrollManager() {
   const { pathname, hash } = useLocation()
@@ -19,6 +20,7 @@ function ScrollManager() {
 function Nav() {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
+  const { usuario } = useSesion()
   return (
     <nav className="nav">
       <div className="wrap">
@@ -28,8 +30,17 @@ function Nav() {
           <NavLink to="/blog" onClick={close}>Blog</NavLink>
           <NavLink to="/privacy" onClick={close}>Privacidad</NavLink>
           <NavLink to="/our-mission" onClick={close}>Nuestra misión</NavLink>
-          <NavLink to="/login" onClick={close}>Iniciar sesión</NavLink>
-          <Link to="/register" className="btn fill small" onClick={close}>Registrarse</Link>
+          {usuario ? (
+            <>
+              <span className="nav-usuario" title={usuario.seudonimo}>{usuario.seudonimo}</span>
+              <button type="button" className="enlace" onClick={() => { close(); salir() }}>Cerrar sesión</button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" onClick={close}>Iniciar sesión</NavLink>
+              <Link to="/register" className="btn fill small" onClick={close}>Registrarse</Link>
+            </>
+          )}
         </div>
         <button className="burger" onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X /> : <Menu />}
@@ -50,8 +61,8 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/our-mission" element={<Mission />} />
-          <Route path="/login" element={<Auth mode="login" />} />
-          <Route path="/register" element={<Auth mode="register" />} />
+          <Route path="/login" element={<Auth key="login" mode="login" />} />
+          <Route path="/register" element={<Auth key="register" mode="register" />} />
         </Routes>
       </main>
       <footer className="foot">

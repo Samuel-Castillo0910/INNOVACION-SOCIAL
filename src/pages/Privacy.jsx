@@ -13,7 +13,7 @@ export default function Privacy() {
       <PageHero eyebrow="Privacidad" title="Privacidad y confianza" lead="Tu identidad y tu voz están 100% protegidas" />
       <section>
         <div className="wrap narrow">
-          <Reveal className="head"><Foto src="/img/diario.webp" alt="Persona escribiendo en un diario de autocuidado" /></Reveal>
+          <Reveal className="head"><Foto src="/img/privacidad.webp" alt="Un laberinto rojo de rejas, candados y balanzas se transforma, a través de un puente, en un paisaje verde donde las personas conversan y se ayudan" clase="completa" /></Reveal>
           {items.map(([t, d], i) => (
             <Reveal key={t} delay={0.05}>
               <div className="card item">
