@@ -62,7 +62,8 @@ section{padding:90px 0}
 .foot{border-top:1px solid var(--line);padding:36px 0;font-size:.85rem}
 .foot .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
 .auth{min-height:100vh;display:grid;place-items:center;padding:110px 24px 60px;background:radial-gradient(ellipse at top,#8b5cf622,transparent 60%)}
-.box{width:100%;max-width:440px;padding:40px}
+.box{width:100%;max-width:440px;padding:40px;justify-self:center}
+.auth{grid-template-columns:minmax(0,1fr)}
 .box:hover{transform:none}
 .field{display:block;margin-top:16px}
 .inp{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 14px;color:var(--muted);transition:.2s}
@@ -86,3 +87,29 @@ section{padding:90px 0}
 .cta.split{text-align:left;padding:28px}
 .cta.split .foto{max-height:300px}
 .cta.split .btn{margin-top:20px}
+/* cuentas, menu con sesion y mensajes del formulario */
+.nav-usuario{color:var(--text);text-transform:none;letter-spacing:0;font-size:.85rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.links button.enlace{background:none;border:0;color:var(--muted);font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:0}
+.links button.enlace:hover{color:var(--text)}
+.pista{display:block;color:var(--muted);font-size:.78rem;line-height:1.45;margin-top:6px}
+.errmsg{color:#f43f5e;font-size:.9rem;margin-top:16px}
+.aviso-cuenta{color:var(--b);font-size:.8rem;margin-top:8px}
+.box .btn.full+.btn.full{margin-top:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+@media(max-width:600px){.box{padding:28px 20px}}
+/* vision y testimonios ilustrativos de inicio */
+.frase-vision{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.35rem,2.4vw,1.75rem);line-height:1.3;color:var(--text);margin-bottom:22px}
+.nota-ilustrativa{max-width:640px;margin:-20px auto 32px;text-align:center;font-size:.85rem;color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:12px 16px}
+.testimonio{display:flex;flex-direction:column;height:100%}
+.testimonio .eyebrow{margin-bottom:10px}
+.testimonio p:not(.eyebrow){font-size:.95rem;line-height:1.6}
+.testimonio .who{margin-top:auto;padding-top:18px}
+.testimonio .who div{display:flex;flex-direction:column;line-height:1.35}
+.testimonio .who b{font-weight:500}
+.testimonio .who .muted{font-size:.8rem}
+/* fotos completas sin recortar */
+.foto.completa{max-height:none;height:auto;object-fit:contain}
+.foto.cuadrada{max-width:440px;margin:0 auto}
+.bienvenida-btn{margin-top:22px}
+/* textos justificados en toda la pagina, menos los que van centrados */
+main p:not(.eyebrow):not(.lead):not(.center):not(.nota-ilustrativa):not(.switch){text-align:justify;hyphens:auto;-webkit-hyphens:auto}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Send, ShieldCheck, LifeBuoy, FlaskConical, ImagePlus, X } from 'lucide-react'
 import { Head } from '../ui'
 import { Avatar, Texto, BarraAcciones } from './Partes'
@@ -6,10 +7,8 @@ import Hilo from './Hilo'
 import { haceCuanto } from './util'
 import { temas } from '../../data/testimonios'
 import { prepararImagen, aTexto } from '../../lib/imagen'
-import {
-  crearPublicacion, leerAlias, guardarAlias, modoLocal, opcionesImagen,
-  MAX_ALIAS, MAX_TITULO, MAX_PUBLICACION,
-} from '../../lib/foro'
+import { crearPublicacion, modoLocal, opcionesImagen, MAX_TITULO, MAX_PUBLICACION } from '../../lib/foro'
+import { faltante } from '../../lib/supabase'
 
 const MINIMO = 10
 
@@ -20,7 +19,7 @@ const filtros = [
 ]
 
 // seccion completa, el formulario para escribir arriba y todas las historias abajo
-export default function Foro({ publicaciones, estado, apoyos, reportados, onApoyar, onReportar, onComentario, onPublicada }) {
+export default function Foro({ publicaciones, estado, usuario, apoyos, reportados, onApoyar, onReportar, onBorrar, onComentario, onPublicada }) {
   const [orden, setOrden] = useState('recientes')
   const [filtro, setFiltro] = useState('todas')
 
@@ -45,12 +44,17 @@ export default function Foro({ publicaciones, estado, apoyos, reportados, onApoy
 
         {modoLocal && (
           <p className="aviso">
-            <FlaskConical size={16} /> Modo de prueba: todavía no hay base de datos conectada, así que lo que publiques solo se
-            guarda en este navegador.
+            <FlaskConical size={16} />
+            <span>
+              Modo de prueba: lo que publiques solo se guarda en este navegador. Para conectar la base de datos falta {faltante}.
+              {import.meta.env.DEV
+                ? ' Revisa el archivo .env.local en la carpeta del proyecto y vuelve a correr npm run dev.'
+                : ' Revisa las Environment Variables en Vercel y dale Redeploy.'}
+            </span>
           </p>
         )}
 
-        <Compositor onPublicada={onPublicada} />
+        <Compositor usuario={usuario} onPublicada={onPublicada} />
 
         <div className="foro-barra">
           <div className="filtros" role="group" aria-label="Mostrar">
@@ -89,11 +93,13 @@ export default function Foro({ publicaciones, estado, apoyos, reportados, onApoy
             <Publicacion
               key={p.id}
               p={p}
+              mia={Boolean(usuario) && p.user_id === usuario.id}
               apoyado={apoyos.has(p.id)}
               reportados={reportados}
               onApoyar={() => onApoyar(p)}
               onReportar={onReportar}
-              onComentario={() => onComentario(p.id)}
+              onBorrar={() => onBorrar(p)}
+              onComentario={(cuantos) => onComentario(p.id, cuantos)}
             />
           ))}
         </div>
@@ -110,10 +116,9 @@ export default function Foro({ publicaciones, estado, apoyos, reportados, onApoy
   )
 }
 
-// formulario para escribir una historia nueva, empieza cerrado como una barra
-function Compositor({ onPublicada }) {
+// formulario para escribir una historia nueva, empieza cerrado como una barra y pide cuenta para publicar
+function Compositor({ usuario, onPublicada }) {
   const [abierto, setAbierto] = useState(false)
-  const [alias, setAlias] = useState(leerAlias)
   const [titulo, setTitulo] = useState('')
   const [texto, setTexto] = useState('')
   const [tema, setTema] = useState(null)
@@ -148,8 +153,7 @@ function Compositor({ onPublicada }) {
     setEnviando(true)
     setMensaje(null)
     try {
-      const nueva = await crearPublicacion({ alias, titulo, texto, tema, imagen: imagen?.blob })
-      guardarAlias(alias)
+      const nueva = await crearPublicacion({ usuario, titulo, texto, tema, imagen: imagen?.blob })
       onPublicada(nueva)
       setTitulo('')
       setTexto('')
@@ -171,6 +175,17 @@ function Compositor({ onPublicada }) {
     </p>
   )
 
+  if (!usuario) {
+    return (
+      <div className="compositor-cerrado sin-cuenta">
+        <Avatar alias="?" />
+        <span className="falso-campo">Para contar tu historia necesitas una cuenta con seudónimo.</span>
+        <Link to="/login" state={{ volver: '/blog#testimonials' }} className="btn small">Entrar</Link>
+        <Link to="/register" state={{ volver: '/blog#testimonials' }} className="btn fill small">Crear cuenta</Link>
+      </div>
+    )
+  }
+
   if (!abierto) {
     return (
       <div>
@@ -182,7 +197,7 @@ function Compositor({ onPublicada }) {
             setMensaje(null)
           }}
         >
-          <Avatar alias={alias.trim() || 'Anónimo'} />
+          <Avatar alias={usuario.seudonimo} />
           <span className="falso-campo">¿Qué viviste en el colegio? Cuéntalo aquí…</span>
           <span className="btn fill small">Escribir</span>
         </button>
@@ -194,8 +209,10 @@ function Compositor({ onPublicada }) {
   return (
     <form className="compositor" onSubmit={publicar}>
       <div className="campo-alias">
-        <Avatar alias={alias.trim() || 'Anónimo'} />
-        <input value={alias} onChange={(e) => setAlias(e.target.value)} placeholder="Tu seudónimo (ej. Azulejo88)" maxLength={MAX_ALIAS} aria-label="Seudónimo" />
+        <Avatar alias={usuario.seudonimo} />
+        <span>
+          Publicas como <b>{usuario.seudonimo}</b>
+        </span>
       </div>
 
       <p className="chips-titulo muted">¿Sobre qué quieres hablar?</p>
@@ -252,8 +269,8 @@ function Compositor({ onPublicada }) {
       <p className="compositor-nota muted">
         <ShieldCheck size={15} />
         <span>
-          Es anónimo. No pongas tu nombre real ni nombres de profesores, compañeros o colegios, y no subas fotos donde se vean
-          caras. Lo que publiques lo puede leer cualquier persona.
+          Solo se ve tu seudónimo. No pongas tu nombre real ni nombres de profesores, compañeros o colegios, y no subas fotos
+          donde se vean caras. Lo que publiques lo puede leer cualquier persona y lo puedes borrar cuando quieras.
         </span>
       </p>
 
@@ -277,14 +294,14 @@ function Compositor({ onPublicada }) {
 }
 
 // una historia con su hilo de respuestas, las del formulario llevan su etiqueta y no se reportan
-function Publicacion({ p, apoyado, reportados, onApoyar, onReportar, onComentario }) {
+function Publicacion({ p, mia, apoyado, reportados, onApoyar, onReportar, onBorrar, onComentario }) {
   const [abierto, setAbierto] = useState(false)
   const deFormulario = p.origen === 'formulario'
 
   return (
     <article className="publicacion">
       <header className="autor">
-        <Avatar alias={p.alias} />
+        <Avatar alias={p.alias} tono={p.tono} />
         <div className="autor-datos">
           <b>{p.alias}</b>
           <span className="muted">{haceCuanto(p.created_at)}</span>
@@ -304,7 +321,8 @@ function Publicacion({ p, apoyado, reportados, onApoyar, onReportar, onComentari
         abierto={abierto}
         onComentarios={() => setAbierto(!abierto)}
         reportado={reportados.has(p.id)}
-        onReportar={deFormulario ? undefined : () => onReportar('publicacion', p.id)}
+        onReportar={deFormulario || mia ? undefined : () => onReportar('publicacion', p.id)}
+        onBorrar={mia ? onBorrar : undefined}
       />
 
       {abierto && <Hilo publicacionId={p.id} onComentario={onComentario} reportados={reportados} onReportar={onReportar} />}

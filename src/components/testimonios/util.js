@@ -28,9 +28,12 @@ export function iniciales(alias) {
   return ((partes[0][0] || '') + (partes[1]?.[0] || '')).toUpperCase()
 }
 
-// el mismo seudonimo siempre da el mismo color
+// tonos bien separados para que los avatares no se parezcan entre si
+export const PALETA = [200, 330, 140, 30, 265, 175, 0, 50, 230, 300, 100, 15]
+
+// el mismo seudonimo siempre da el mismo color de la paleta
 export function colorDe(alias) {
-  let tono = 0
-  for (const letra of alias || '') tono = (tono * 31 + letra.codePointAt(0)) % 360
-  return tono
+  let suma = 0
+  for (const letra of alias || '') suma = (suma * 31 + letra.codePointAt(0)) % 1000003
+  return PALETA[suma % PALETA.length]
 }
