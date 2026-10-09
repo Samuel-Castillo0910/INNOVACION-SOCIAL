@@ -2,11 +2,11 @@
 
 **Página en línea:** [loss-of-otherness.vercel.app](https://loss-of-otherness.vercel.app)
 
-Plataforma web de un proyecto de innovación social sobre la **pérdida de la otredad en las comunidades escolares**. Es un espacio anónimo donde estudiantes, egresados y profesores cuentan cómo vivieron las normas del colegio, cómo los describían y si de verdad los escuchaban.
+Plataforma web para el proyecto de innovación social sobre la **pérdida de la otredad en las comunidades escolares**. Es un espacio anónimo donde estudiantes, egresados y profesores cuentan cómo vivieron las normas del colegio, cómo los describían y si de verdad los escuchaban.
 
 > “Trascender la norma sancionatoria para construir comunidades educativas empáticas y humanas.”
 
-Proyecto del curso de Innovación Social, Universidad EIA.
+Proyecto de Innovación Social, Universidad EIA.
 
 ---
 
@@ -34,7 +34,7 @@ Cuando un colegio pasa de describir lo que alguien hizo a decidir quién es, se 
 
 ## Testimonios
 
-- **Del formulario:** 9 personas respondieron de forma anónima un formulario entre el 5 y el 7 de octubre de 2026. Las respuestas de cada persona se juntaron en un solo texto en primera persona, con el seudónimo que cada una eligió y sin agregar información.
+- **Del formulario:** 9 personas respondieron de forma anónima un formulario entre el 1 y el 7 de octubre de 2026. Las respuestas de cada persona se juntaron en un solo texto en primera persona, con el seudónimo que cada una eligió y sin agregar información.
 - **Ilustrativos (en Inicio):** tres testimonios escritos por el equipo a partir de las preguntas de la encuesta, para mostrar el tipo de experiencias que recoge el foro. En la página están marcados como ilustrativos.
 - **De la comunidad:** lo que publica cualquier persona con una cuenta.
 
