@@ -1,40 +1,27 @@
-import { Link } from 'react-router-dom'
-import { Eye, Target, Heart, Users, Lightbulb, Globe } from 'lucide-react'
-import { T, Img, Reveal, Head, PageHero } from '../components/ui'
-
-const core = [[Eye, 'Vision'], [Target, 'Mission'], [Heart, 'Purpose']]
-const values = [Users, Lightbulb, Globe, Heart]
+import { Reveal, PageHero, Foto } from '../components/ui'
 
 export default function Mission() {
   return (
     <>
-      <PageHero eyebrow="Our Mission" title="Why we exist" />
+      <PageHero eyebrow="Nuestra misión" title="Misión y visión" lead={null} />
       <section>
-        <div className="wrap grid">
-          {core.map(([I, t], i) => (
-            <Reveal key={t} delay={i * 0.12}>
-              <div className="card"><I className="ico" size={30} /><h3>{t}</h3><p className="muted">{T}</p></div>
-            </Reveal>
-          ))}
+        <div className="wrap split">
+          <Reveal><Foto src="/img/espejo.webp" alt="Persona frente a un espejo rodeado de flores" alto /></Reveal>
+          <Reveal delay={0.15}>
+            <h2>Misión</h2>
+            <p className="muted">Somos una iniciativa de investigación y concientización fundamentada en el diseño centrado en las personas (<em>Human-Centered Design</em>). Surgimos a partir del trabajo de campo, la auditoría sistemática a manuales de convivencia escolares en Medellín y Rionegro, y el desarrollo de conversaciones coautoradas con estudiantes y egresados.</p>
+            <p className="muted">A través del análisis de datos de los reglamentos institucionales, evidenciamos cómo el lenguaje normativo juzga por <em>atributos</em> en lugar de <em>conductas</em>, limitando el derecho a ser escuchado exclusivamente a escenarios de acusación (<em>descargos</em>). Nuestra misión es visibilizar esta pérdida de la otredad, ofreciendo herramientas basadas en evidencia que transformen el juzgamiento punitivo en un acompañamiento real que proteja la salud mental y la dignidad de los estudiantes.</p>
+          </Reveal>
         </div>
       </section>
       <section className="alt">
         <div className="wrap split">
-          <Reveal><p className="eyebrow">Our story</p><h2>{T}</h2><p className="muted">{T}</p><p className="muted">{T}</p></Reveal>
-          <Reveal delay={0.15}><Img h={320} /></Reveal>
-        </div>
-      </section>
-      <section>
-        <div className="wrap">
-          <Head eyebrow="Values" title="What we stand for" center />
-          <div className="grid">
-            {values.map((I, i) => (
-              <Reveal key={i} delay={i * 0.1}>
-                <div className="card"><I className="ico" size={26} /><h3>{T}</h3><p className="muted">{T}</p></div>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal className="center more"><Link to="/register" className="btn fill">Join us</Link></Reveal>
+          <Reveal>
+            <h2>Visión</h2>
+            <p className="muted">TEXTO VA AQUI</p>
+            <p className="muted">TEXTO VA AQUI</p>
+          </Reveal>
+          <Reveal delay={0.15}><Foto src="/img/diversidad.webp" alt="Ilustración de personas diversas bailando y abrazándose" /></Reveal>
         </div>
       </section>
     </>

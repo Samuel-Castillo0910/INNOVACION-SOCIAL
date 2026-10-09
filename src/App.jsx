@@ -24,12 +24,12 @@ function Nav() {
       <div className="wrap">
         <Link to="/" className="logo" onClick={close}>LOSS OF OTHERNESS</Link>
         <div className={'links' + (open ? ' open' : '')}>
-          <NavLink to="/" end onClick={close}>Home</NavLink>
+          <NavLink to="/" end onClick={close}>Inicio</NavLink>
           <NavLink to="/blog" onClick={close}>Blog</NavLink>
-          <NavLink to="/privacy" onClick={close}>Privacy</NavLink>
-          <NavLink to="/our-mission" onClick={close}>Our Mission</NavLink>
-          <NavLink to="/login" onClick={close}>Log in</NavLink>
-          <Link to="/register" className="btn fill small" onClick={close}>Sign up</Link>
+          <NavLink to="/privacy" onClick={close}>Privacidad</NavLink>
+          <NavLink to="/our-mission" onClick={close}>Nuestra misión</NavLink>
+          <NavLink to="/login" onClick={close}>Iniciar sesión</NavLink>
+          <Link to="/register" className="btn fill small" onClick={close}>Registrarse</Link>
         </div>
         <button className="burger" onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X /> : <Menu />}
@@ -59,8 +59,8 @@ export default function App() {
           <span className="logo">LOSS OF OTHERNESS</span>
           <div className="links">
             <Link to="/blog">Blog</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/our-mission">Our Mission</Link>
+            <Link to="/privacy">Privacidad</Link>
+            <Link to="/our-mission">Nuestra misión</Link>
           </div>
           <span className="muted">© 2026 LOSS OF OTHERNESS</span>
         </div>

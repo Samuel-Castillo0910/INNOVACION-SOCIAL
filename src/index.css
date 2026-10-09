@@ -80,3 +80,9 @@ section{padding:90px 0}
 .split{grid-template-columns:1fr}
 .foot .wrap{flex-direction:column}
 }
+.foto{width:100%;max-height:420px;object-fit:cover;border-radius:var(--r);display:block;border:1px solid var(--line)}
+.foto.alto{max-height:540px}
+.banner{padding:0 0 90px}
+.cta.split{text-align:left;padding:28px}
+.cta.split .foto{max-height:300px}
+.cta.split .btn{margin-top:20px}
