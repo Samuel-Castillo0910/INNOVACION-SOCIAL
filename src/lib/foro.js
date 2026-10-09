@@ -12,7 +12,7 @@ export const opcionesImagen = modoLocal ? { ladoMaximo: 1000, calidad: 0.7 } : {
 
 // limites de lo que escribe la gente, son los mismos que revisa supabase
 export const MAX_TITULO = 120
-export const MAX_PUBLICACION = 4000
+export const MAX_PUBLICACION = 20000
 export const MAX_COMENTARIO = 2000
 
 // modo de prueba, todo vive en el localstorage del navegador con la misma forma que las tablas de supabase

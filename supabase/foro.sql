@@ -139,7 +139,7 @@ create policy "crear publicaciones" on publicaciones
   for insert to authenticated with check (
     user_id = auth.uid()
     and fijada = false and apoyos = 0 and reportes = 0
-    and char_length(trim(texto)) between 1 and 4000
+    and char_length(trim(texto)) between 1 and 20000
     and char_length(alias) between 1 and 40
     and (titulo is null or char_length(titulo) <= 120)
     and (tema is null or char_length(tema) <= 60)

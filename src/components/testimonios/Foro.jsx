@@ -275,9 +275,6 @@ function Compositor({ usuario, onPublicada }) {
       </p>
 
       <div className="compositor-pie">
-        <span className="muted contador">
-          {texto.length}/{MAX_PUBLICACION}
-        </span>
         <div className="botones">
           <button type="button" className="btn small" onClick={() => setAbierto(false)}>
             Cancelar

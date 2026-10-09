@@ -20,7 +20,7 @@
 .compositor-nota{display:flex;gap:8px;align-items:flex-start;font-size:.8rem;line-height:1.5;margin-top:12px}
 .compositor-nota svg{flex-shrink:0;margin-top:2px;color:var(--b)}
 .compositor-pie{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px}
-.contador{font-size:.75rem;font-variant-numeric:tabular-nums}
+.compositor-pie .botones{margin-left:auto}
 .compositor .btn:disabled,.caja .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 .mensaje{font-size:.88rem;margin-top:12px}
 .mensaje.ok{color:var(--b)}
