@@ -12,7 +12,7 @@ Proyecto de Innovación Social, Universidad EIA.
 
 ## El problema
 
-Al revisar manuales de convivencia de colegios de Medellín y Rionegro encontramos que el lenguaje normativo muchas veces juzga a los estudiantes por **atributos** ("desinteresado", "apático", "conflictivo") en lugar de por **conductas**. Además, el derecho a ser escuchado suele quedar limitado a los momentos de acusación, como los descargos.
+Al revisar manuales de convivencia de colegios de Medellín y Rionegro encontramos que el lenguaje normativo muchas veces juzga a los estudiantes por **atributos** ("desinteresado", "apático", "conflictivo") en lugar de por **conductas**. Además, el derecho a ser escuchado suele quedar limitado a los momentos de acusación.
 
 Cuando un colegio pasa de describir lo que alguien hizo a decidir quién es, se pierde la mirada sobre la persona: eso es lo que llamamos pérdida de la otredad.
 
