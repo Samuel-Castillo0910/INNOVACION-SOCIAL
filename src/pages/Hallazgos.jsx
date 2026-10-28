@@ -37,8 +37,9 @@ export default function Hallazgos() {
               ))}
             </ul>
             <p className="muted nota-limite">
-              Ninguno de estos tres manuales es de un colegio de Medellín. Por eso son ejemplos de cómo se puede escribir una norma
-              que juzga a la persona, no una muestra de lo que pasa en todos los colegios. Revisar manuales de colegios privados
+              No mostramos el nombre de los colegios porque no buscamos señalar a ninguno, sino mostrar cómo una norma puede juzgar
+              a la persona en vez de lo que hizo. Los tres son de otras ciudades, ninguno de Medellín, así que estos hallazgos son
+              ejemplos del problema y no una muestra de lo que pasa en todos los colegios. Revisar manuales de colegios privados
               católicos de Medellín es nuestro siguiente paso.
             </p>
           </Reveal>
