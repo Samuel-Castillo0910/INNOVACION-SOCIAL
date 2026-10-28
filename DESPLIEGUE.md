@@ -39,7 +39,31 @@ Cada vez que se sube algo a la rama principal en GitHub, Vercel actualiza la pá
 
 ## 5. Moderar
 
-- Borrar una publicación o comentario: Supabase → **Table Editor** → `publicaciones` o `comentarios` → borrar la fila.
+La moderación tiene cuatro partes:
+
+- **Normas del foro:** se ven arriba de las historias. Se puede criticar una norma, a un profesor o a un colegio, pero sin insultar ni escribir nombres reales.
+- **Filtro de insultos:** la página no deja publicar ni comentar mensajes con insultos ni nombres de colegios o personas. La base de datos revisa los mismos insultos con la función `texto_permitido` de `supabase/foro.sql`, así que tampoco se puede saltar desde fuera de la página. La lista de palabras está en ese archivo y en `src/lib/moderacion.js`; si cambian una, cambien la otra.
+- **Aviso de cuidado:** si alguien escribe algo que suena a riesgo (por ejemplo "quiero desaparecer"), antes de publicar le aparecen las líneas de ayuda. No se bloquea, solo se avisa.
+- **Cuentas del equipo:** pueden quitar publicaciones y comentarios de cualquier persona, y llevan la etiqueta **Equipo**. No pueden quitar los testimonios del formulario.
+
+Para volver moderadora una cuenta:
+
+1. Creen la cuenta en la página, por ejemplo con el seudónimo `Equipo LOSS OF OTHERNESS`.
+2. En Supabase, **SQL Editor**, corran esto con el seudónimo exacto:
+
+   ```sql
+   insert into moderadores (user_id)
+   select id from auth.users where raw_user_meta_data ->> 'seudonimo' = 'Equipo LOSS OF OTHERNESS'
+   on conflict do nothing;
+   ```
+
+3. Recarguen la página. Ya debe aparecer la etiqueta y el botón **Quitar**.
+
+Para quitarle el permiso: `delete from moderadores;` borra a todos, o borren la fila en **Table Editor → moderadores**.
+
+También se puede moderar desde Supabase:
+
+- Borrar una publicación o comentario: **Table Editor** → `publicaciones` o `comentarios` → borrar la fila.
 - Borrar una cuenta: **Authentication → Users**.
 - Las publicaciones con 3 reportes se ocultan solas. Se pueden revisar en la tabla `reportes`.
 

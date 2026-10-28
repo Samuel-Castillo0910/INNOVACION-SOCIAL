@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CornerDownRight, Flag, Trash2 } from 'lucide-react'
+import { CornerDownRight, Flag, Trash2, ShieldX } from 'lucide-react'
 import { Avatar, Texto, CajaComentario } from './Partes'
+import { EtiquetaEquipo } from './Normas'
 import { haceCuanto } from './util'
 import { listarComentarios, crearComentario, borrarComentario } from '../../lib/foro'
 import { useSesion } from '../../lib/sesion'
@@ -10,7 +11,7 @@ const NIVEL_MAXIMO = 5
 
 // hilo de comentarios de una publicacion, como en reddit cada comentario puede tener respuestas
 // onComentario recibe cuantos comentarios se sumaron o se quitaron
-export default function Hilo({ publicacionId, onComentario, reportados, onReportar }) {
+export default function Hilo({ publicacionId, onComentario, reportados, onReportar, esEquipo = () => false, soyModerador = false }) {
   const { usuario } = useSesion()
   const [comentarios, setComentarios] = useState([])
   const [estado, setEstado] = useState('cargando')
@@ -46,9 +47,12 @@ export default function Hilo({ publicacionId, onComentario, reportados, onReport
     onComentario?.(1)
   }
 
-  // borra el comentario y todas sus respuestas
-  const borrar = async (id) => {
-    if (!window.confirm('¿Borrar este comentario y sus respuestas? No se puede deshacer.')) return
+  // borra el comentario y todas sus respuestas, moderando es cuando lo quita alguien del equipo
+  const borrar = async (id, moderando = false) => {
+    const pregunta = moderando
+      ? '¿Quitar este comentario y sus respuestas porque no cumple las normas del foro? No se puede deshacer.'
+      : '¿Borrar este comentario y sus respuestas? No se puede deshacer.'
+    if (!window.confirm(pregunta)) return
     const fuera = new Set([id])
     const juntar = (padre) => (ramas[padre] || []).forEach((h) => { fuera.add(h.id); juntar(h.id) })
     juntar(id)
@@ -61,7 +65,7 @@ export default function Hilo({ publicacionId, onComentario, reportados, onReport
     }
   }
 
-  const comunes = { ramas, responder, borrar, usuario, reportados, onReportar }
+  const comunes = { ramas, responder, borrar, usuario, reportados, onReportar, esEquipo, soyModerador }
 
   return (
     <div className="hilo">
@@ -82,7 +86,7 @@ export default function Hilo({ publicacionId, onComentario, reportados, onReport
   )
 }
 
-function Comentario({ c, nivel, ramas, responder, borrar, usuario, reportados, onReportar }) {
+function Comentario({ c, nivel, ramas, responder, borrar, usuario, reportados, onReportar, esEquipo, soyModerador }) {
   const [respondiendo, setRespondiendo] = useState(false)
   const [plegado, setPlegado] = useState(false)
   const hijos = ramas[c.id] || []
@@ -94,6 +98,7 @@ function Comentario({ c, nivel, ramas, responder, borrar, usuario, reportados, o
       <div className="autor chico">
         <Avatar alias={c.alias} chico />
         <b>{c.alias}</b>
+        {esEquipo(c.user_id) && <EtiquetaEquipo />}
         <span className="muted">· {haceCuanto(c.created_at)}</span>
       </div>
 
@@ -117,6 +122,11 @@ function Comentario({ c, nivel, ramas, responder, borrar, usuario, reportados, o
               <Flag size={13} /> <span className="etq">{reportado ? 'Reportado' : 'Reportar'}</span>
             </button>
           )}
+          {soyModerador && !mio && (
+            <button type="button" className="accion quitar" onClick={() => borrar(c.id, true)} aria-label="Quitar por no cumplir las normas">
+              <ShieldX size={13} /> <span className="etq">Quitar</span>
+            </button>
+          )}
         </div>
 
         {respondiendo && (
@@ -136,7 +146,19 @@ function Comentario({ c, nivel, ramas, responder, borrar, usuario, reportados, o
       {hijos.length > 0 && !plegado && (
         <ul className={'ramas anidadas' + (nivel >= NIVEL_MAXIMO ? ' planas' : '')}>
           {hijos.map((h) => (
-            <Comentario key={h.id} c={h} nivel={nivel + 1} ramas={ramas} responder={responder} borrar={borrar} usuario={usuario} reportados={reportados} onReportar={onReportar} />
+            <Comentario
+              key={h.id}
+              c={h}
+              nivel={nivel + 1}
+              ramas={ramas}
+              responder={responder}
+              borrar={borrar}
+              usuario={usuario}
+              reportados={reportados}
+              onReportar={onReportar}
+              esEquipo={esEquipo}
+              soyModerador={soyModerador}
+            />
           ))}
         </ul>
       )}

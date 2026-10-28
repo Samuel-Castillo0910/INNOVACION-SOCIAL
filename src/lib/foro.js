@@ -67,6 +67,21 @@ export async function listarPublicaciones() {
   return data.map(({ comentarios, ...p }) => ({ ...p, n_comentarios: comentarios?.[0]?.count ?? 0 }))
 }
 
+// cuentas moderadoras del equipo, si la tabla todavia no existe en supabase no hay moderadores
+// en modo de prueba es moderadora cualquier cuenta cuyo seudonimo empiece por equipo
+export async function listarModeradores() {
+  if (modoLocal) return new Set()
+  const { data, error } = await db.from('moderadores').select('user_id')
+  if (error) return new Set()
+  return new Set(data.map((m) => m.user_id))
+}
+
+export function esDelEquipo(userId, moderadores) {
+  if (!userId) return false
+  if (modoLocal) return userId.startsWith('prueba-equipo')
+  return moderadores.has(userId)
+}
+
 // lo que esta cuenta ya apoyo y ya reporto
 export async function misMarcas(usuario) {
   if (!usuario) return { apoyos: new Set(), reportes: new Set() }

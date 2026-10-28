@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, MessageCircle, Flag, Send, Trash2 } from 'lucide-react'
+import { Heart, HeartHandshake, MessageCircle, Flag, Send, Trash2, LifeBuoy, ShieldX } from 'lucide-react'
 import { iniciales, colorDe } from './util'
 import { MAX_COMENTARIO } from '../../lib/foro'
 import { useSesion } from '../../lib/sesion'
+import { revisar, esRechazoPorNormas, MENSAJE_INSULTO } from '../../lib/moderacion'
+import { lineas, EMERGENCIA } from '../../data/ayuda'
 
 // circulo con las iniciales del seudonimo
 export function Avatar({ alias, chico, tono }) {
@@ -41,7 +43,7 @@ export function Texto({ texto, limite = 700 }) {
 }
 
 // botones de abajo de cada publicacion, me identifico, respuestas, borrar y reportar
-export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto, onComentarios, reportado, onReportar, onBorrar }) {
+export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto, onComentarios, reportado, onReportar, onBorrar, onQuitar }) {
   const textoComentarios = comentarios === 0 ? 'Responder' : comentarios === 1 ? '1 respuesta' : `${comentarios} respuestas`
   return (
     <div className="acciones">
@@ -62,6 +64,36 @@ export function BarraAcciones({ apoyos, apoyado, onApoyar, comentarios, abierto,
           <Flag size={14} /> <span className="etq">{reportado ? 'Reportado' : 'Reportar'}</span>
         </button>
       )}
+      {onQuitar && (
+        <button type="button" className="accion quitar" onClick={onQuitar} aria-label="Quitar por no cumplir las normas">
+          <ShieldX size={14} /> <span className="etq">Quitar</span>
+        </button>
+      )}
+    </div>
+  )
+}
+
+// aviso con las lineas de ayuda cuando lo que se va a publicar suena a riesgo, no bloquea
+export function Cuidado({ onSeguir, onPublicar, textoBoton = 'Publicar igual' }) {
+  return (
+    <div className="cuidado" role="alert">
+      <LifeBuoy size={18} />
+      <div>
+        <b>Lo que escribiste suena muy difícil.</b>
+        <p>
+          No tienes que cargarlo solo. Si quieres hablar con alguien ahora, la <a href={lineas[0].tel}>Línea 106</a> y la Línea Amiga
+          Saludable, al <a href={lineas[1].tel}>{lineas[1].numero}</a>, atienden gratis las 24 horas. Si estás en peligro, marca{' '}
+          <a href={EMERGENCIA.tel}>{EMERGENCIA.numero}</a>.
+        </p>
+        <div className="botones">
+          <button type="button" className="btn small" onClick={onSeguir}>
+            Seguir escribiendo
+          </button>
+          <button type="button" className="btn fill small" onClick={onPublicar}>
+            {textoBoton}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -72,6 +104,7 @@ export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton =
   const [texto, setTexto] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
+  const [cuidado, setCuidado] = useState(false)
 
   if (!usuario) {
     return (
@@ -87,16 +120,27 @@ export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton =
     )
   }
 
-  const enviar = async (e) => {
-    e.preventDefault()
+  // forzar es cuando la persona ya vio las lineas de ayuda y decide enviar igual
+  const enviar = async (e, forzar = false) => {
+    e?.preventDefault()
     if (!texto.trim()) return
+    const { bloqueo, riesgo } = revisar(texto)
+    if (bloqueo) {
+      setError(bloqueo)
+      return
+    }
+    if (riesgo && !forzar) {
+      setCuidado(true)
+      return
+    }
+    setCuidado(false)
     setEnviando(true)
     setError('')
     try {
       await onEnviar(texto)
       setTexto('')
-    } catch {
-      setError('No se pudo enviar, intenta de nuevo.')
+    } catch (err) {
+      setError(esRechazoPorNormas(err) ? MENSAJE_INSULTO : 'No se pudo enviar, intenta de nuevo.')
     } finally {
       setEnviando(false)
     }
@@ -113,6 +157,13 @@ export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton =
         autoFocus={autoFocus}
         aria-label={placeholder}
       />
+      <p className="reglas">
+        <HeartHandshake size={14} />
+        <span>
+          Para acompañar: escucha sin juzgar, cuenta si te pasó algo parecido, no diagnostiques a nadie y, si alguien está en
+          riesgo, recomiéndale la <a href="tel:106">Línea 106</a>.
+        </span>
+      </p>
       <div className="caja-pie">
         <span className="como">
           <Avatar alias={usuario.seudonimo} chico /> {usuario.seudonimo}
@@ -126,6 +177,7 @@ export function CajaComentario({ onEnviar, onCancelar, placeholder, textoBoton =
           {enviando ? 'Enviando…' : textoBoton} <Send size={14} />
         </button>
       </div>
+      {cuidado && <Cuidado onSeguir={() => setCuidado(false)} onPublicar={() => enviar(null, true)} textoBoton="Enviar igual" />}
       {error && <p className="mensaje error">{error}</p>}
     </form>
   )
