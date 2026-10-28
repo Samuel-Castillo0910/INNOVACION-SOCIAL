@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Send, ShieldCheck, LifeBuoy, FlaskConical, ImagePlus, X } from 'lucide-react'
+import { Send, ShieldCheck, FlaskConical, ImagePlus, X } from 'lucide-react'
 import { Head } from '../ui'
-import { Avatar, Texto, BarraAcciones } from './Partes'
+import { Ayuda, Encuesta } from '../Ayuda'
+import { Avatar, Texto, BarraAcciones, Cuidado } from './Partes'
+import { Normas, EtiquetaEquipo } from './Normas'
 import Hilo from './Hilo'
 import { haceCuanto } from './util'
 import { temas } from '../../data/testimonios'
 import { prepararImagen, aTexto } from '../../lib/imagen'
 import { crearPublicacion, modoLocal, opcionesImagen, MAX_TITULO, MAX_PUBLICACION } from '../../lib/foro'
 import { faltante } from '../../lib/supabase'
+import { revisar, esRechazoPorNormas, MENSAJE_INSULTO } from '../../lib/moderacion'
 
 const MINIMO = 10
 
@@ -19,7 +22,7 @@ const filtros = [
 ]
 
 // seccion completa, el formulario para escribir arriba y todas las historias abajo
-export default function Foro({ publicaciones, estado, usuario, apoyos, reportados, onApoyar, onReportar, onBorrar, onComentario, onPublicada }) {
+export default function Foro({ publicaciones, estado, usuario, apoyos, reportados, onApoyar, onReportar, onBorrar, onQuitar, onComentario, onPublicada, esEquipo, soyModerador }) {
   const [orden, setOrden] = useState('recientes')
   const [filtro, setFiltro] = useState('todas')
 
@@ -38,9 +41,13 @@ export default function Foro({ publicaciones, estado, usuario, apoyos, reportado
       <div className="wrap narrow">
         <Head eyebrow="Testimonios" title="Voces del colegio" center />
         <p className="muted center foro-intro">
-          Las primeras historias vienen de un formulario anónimo, cada una junta en un solo texto lo que respondió una
-          persona. Aquí cualquiera puede contar la suya con un seudónimo, decir que se identifica con otras y responderles.
+          Aquí estudiantes y egresados cuentan con un seudónimo cómo los juzgaron o los escucharon en el colegio. Las primeras
+          historias vienen de una encuesta anónima: cada una junta en un solo texto lo que respondió una persona. Si te
+          identificas con alguna, díselo o respóndele.
         </p>
+
+        <Ayuda compacta />
+        <Normas />
 
         {modoLocal && (
           <p className="aviso">
@@ -99,18 +106,18 @@ export default function Foro({ publicaciones, estado, usuario, apoyos, reportado
               onApoyar={() => onApoyar(p)}
               onReportar={onReportar}
               onBorrar={() => onBorrar(p)}
+              onQuitar={soyModerador ? () => onQuitar(p) : undefined}
+              esEquipo={esEquipo}
+              soyModerador={soyModerador}
               onComentario={(cuantos) => onComentario(p.id, cuantos)}
             />
           ))}
         </div>
 
-        <p className="ayuda">
-          <LifeBuoy size={18} />
-          <span>
-            Si contar esto te removió algo o estás pasando por un momento difícil, no tienes que cargar con eso sin ayuda. En Medellín
-            puedes llamar gratis a la <b>Línea 106</b>, las 24 horas. En una emergencia, marca <b>123</b>.
-          </span>
-        </p>
+        <div className="foro-final">
+          <Encuesta />
+          <Ayuda id="ayuda" />
+        </div>
       </div>
     </section>
   )
@@ -126,6 +133,7 @@ function Compositor({ usuario, onPublicada }) {
   const [procesando, setProcesando] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState(null)
+  const [cuidado, setCuidado] = useState(false)
   const pregunta = temas.find((t) => t.nombre === tema)?.pregunta
 
   const elegirImagen = async (e) => {
@@ -144,12 +152,24 @@ function Compositor({ usuario, onPublicada }) {
     }
   }
 
-  const publicar = async (e) => {
-    e.preventDefault()
+  // forzar es cuando la persona ya vio las lineas de ayuda y decide publicar igual
+  const publicar = async (e, forzar = false) => {
+    e?.preventDefault()
     if (texto.trim().length < MINIMO) {
       setMensaje({ tipo: 'error', texto: `Escribe un poco más para publicar, mínimo ${MINIMO} caracteres.` })
       return
     }
+    const { bloqueo, riesgo } = revisar(`${titulo}\n${texto}`)
+    if (bloqueo) {
+      setMensaje({ tipo: 'error', texto: bloqueo })
+      return
+    }
+    if (riesgo && !forzar) {
+      setMensaje(null)
+      setCuidado(true)
+      return
+    }
+    setCuidado(false)
     setEnviando(true)
     setMensaje(null)
     try {
@@ -160,9 +180,13 @@ function Compositor({ usuario, onPublicada }) {
       setTema(null)
       setImagen(null)
       setAbierto(false)
-      setMensaje({ tipo: 'ok', texto: 'Tu historia ya está publicada. Gracias por contarla.' })
+      setMensaje({ tipo: 'ok', texto: 'Tu historia ya está publicada. Gracias por contarla.', ayuda: true })
     } catch (err) {
-      const textoError = modoLocal && err?.message ? err.message : 'No se pudo publicar. Revisa tu conexión e intenta de nuevo.'
+      const textoError = esRechazoPorNormas(err)
+        ? MENSAJE_INSULTO
+        : modoLocal && err?.message
+          ? err.message
+          : 'No se pudo publicar. Revisa tu conexión e intenta de nuevo.'
       setMensaje({ tipo: 'error', texto: textoError })
     } finally {
       setEnviando(false)
@@ -172,6 +196,12 @@ function Compositor({ usuario, onPublicada }) {
   const aviso = mensaje && (
     <p className={'mensaje ' + mensaje.tipo} role="status">
       {mensaje.texto}
+      {mensaje.ayuda && (
+        <span className="mensaje-ayuda">
+          Si contarla te removió algo, no tienes que cargarlo solo: la <a href="tel:106"><b>Línea 106</b></a> atiende gratis las 24
+          horas. <a href="#ayuda" className="subrayado">Ver más líneas</a>
+        </span>
+      )}
     </p>
   )
 
@@ -270,9 +300,12 @@ function Compositor({ usuario, onPublicada }) {
         <ShieldCheck size={15} />
         <span>
           Solo se ve tu seudónimo. No pongas tu nombre real ni nombres de profesores, compañeros o colegios, y no subas fotos
-          donde se vean caras. Lo que publiques lo puede leer cualquier persona y lo puedes borrar cuando quieras.
+          donde se vean caras. Puedes criticar sin insultar: los mensajes con insultos no se publican. Lo que publiques lo puede
+          leer cualquier persona y lo puedes borrar cuando quieras.
         </span>
       </p>
+
+      {cuidado && <Cuidado onSeguir={() => setCuidado(false)} onPublicar={() => publicar(null, true)} />}
 
       <div className="compositor-pie">
         <div className="botones">
@@ -291,7 +324,7 @@ function Compositor({ usuario, onPublicada }) {
 }
 
 // una historia con su hilo de respuestas, las del formulario llevan su etiqueta y no se reportan
-function Publicacion({ p, mia, apoyado, reportados, onApoyar, onReportar, onBorrar, onComentario }) {
+function Publicacion({ p, mia, apoyado, reportados, onApoyar, onReportar, onBorrar, onQuitar, onComentario, esEquipo, soyModerador }) {
   const [abierto, setAbierto] = useState(false)
   const deFormulario = p.origen === 'formulario'
 
@@ -300,7 +333,10 @@ function Publicacion({ p, mia, apoyado, reportados, onApoyar, onReportar, onBorr
       <header className="autor">
         <Avatar alias={p.alias} tono={p.tono} />
         <div className="autor-datos">
-          <b>{p.alias}</b>
+          <b>
+            {p.alias}
+            {!deFormulario && esEquipo(p.user_id) && <EtiquetaEquipo />}
+          </b>
           <span className="muted">{haceCuanto(p.created_at)}</span>
         </div>
         {deFormulario ? <span className="tema formulario">Formulario</span> : p.tema && <span className="tema">{p.tema}</span>}
@@ -320,9 +356,19 @@ function Publicacion({ p, mia, apoyado, reportados, onApoyar, onReportar, onBorr
         reportado={reportados.has(p.id)}
         onReportar={deFormulario || mia ? undefined : () => onReportar('publicacion', p.id)}
         onBorrar={mia ? onBorrar : undefined}
+        onQuitar={onQuitar && !mia && !deFormulario ? onQuitar : undefined}
       />
 
-      {abierto && <Hilo publicacionId={p.id} onComentario={onComentario} reportados={reportados} onReportar={onReportar} />}
+      {abierto && (
+        <Hilo
+          publicacionId={p.id}
+          onComentario={onComentario}
+          reportados={reportados}
+          onReportar={onReportar}
+          esEquipo={esEquipo}
+          soyModerador={soyModerador}
+        />
+      )}
     </article>
   )
 }

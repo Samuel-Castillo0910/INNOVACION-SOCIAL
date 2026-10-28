@@ -98,5 +98,6 @@ export const temas = [
   { nombre: 'Ser escuchado', pregunta: '¿Te escuchaban para conocerte y cuidarte, o solo para que te defendieras?' },
   { nombre: 'Reescribir mi historia', pregunta: 'Si pudieras reescribir lo que el colegio dijo de ti, ¿qué pondrías?' },
   { nombre: '“Perezoso”', pregunta: '¿Viste a alguien ser tratado de perezoso o desinteresado sin que nadie preguntara qué le pasaba?' },
+  { nombre: 'Cómo me afectó', pregunta: '¿Cómo te hizo sentir esa etiqueta y qué te ayudó?' },
   { nombre: 'Tema libre', pregunta: 'Cuenta lo que quieras de tu paso por el colegio.' },
 ]

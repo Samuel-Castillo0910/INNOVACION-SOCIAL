@@ -6,6 +6,8 @@ import Blog from './pages/Blog'
 import Privacy from './pages/Privacy'
 import Mission from './pages/Mission'
 import Auth from './pages/Auth'
+import Hallazgos from './pages/Hallazgos'
+import Docentes from './pages/Docentes'
 import { useSesion, salir } from './lib/sesion'
 
 function ScrollManager() {
@@ -27,9 +29,11 @@ function Nav() {
         <Link to="/" className="logo" onClick={close}>LOSS OF OTHERNESS</Link>
         <div className={'links' + (open ? ' open' : '')}>
           <NavLink to="/" end onClick={close}>Inicio</NavLink>
-          <NavLink to="/blog" onClick={close}>Blog</NavLink>
+          <NavLink to="/blog" onClick={close}>Historias</NavLink>
+          <NavLink to="/hallazgos" onClick={close}>Hallazgos</NavLink>
+          <NavLink to="/docentes-y-familias" onClick={close}>Docentes y familias</NavLink>
+          <NavLink to="/our-mission" onClick={close}>Misión</NavLink>
           <NavLink to="/privacy" onClick={close}>Privacidad</NavLink>
-          <NavLink to="/our-mission" onClick={close}>Nuestra misión</NavLink>
           {usuario ? (
             <>
               <span className="nav-usuario" title={usuario.seudonimo}>{usuario.seudonimo}</span>
@@ -61,6 +65,8 @@ export default function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/our-mission" element={<Mission />} />
+          <Route path="/hallazgos" element={<Hallazgos />} />
+          <Route path="/docentes-y-familias" element={<Docentes />} />
           <Route path="/login" element={<Auth key="login" mode="login" />} />
           <Route path="/register" element={<Auth key="register" mode="register" />} />
         </Routes>
@@ -69,11 +75,12 @@ export default function App() {
         <div className="wrap">
           <span className="logo">LOSS OF OTHERNESS</span>
           <div className="links">
-            <Link to="/blog">Blog</Link>
+            <Link to="/blog">Historias</Link>
+            <Link to="/hallazgos">Hallazgos</Link>
+            <Link to="/docentes-y-familias">Docentes y familias</Link>
             <Link to="/privacy">Privacidad</Link>
-            <Link to="/our-mission">Nuestra misión</Link>
           </div>
-          <span className="muted">© 2026 LOSS OF OTHERNESS</span>
+          <span className="muted">¿Necesitas hablar con alguien? Línea 106, gratis las 24 horas.</span>
         </div>
       </footer>
     </>

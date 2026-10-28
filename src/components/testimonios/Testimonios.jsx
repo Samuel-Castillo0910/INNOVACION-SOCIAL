@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Foro from './Foro'
 import { testimonios } from '../../data/testimonios'
 import { PALETA } from './util'
-import { listarPublicaciones, misMarcas, cambiarApoyo, reportar, borrarPublicacion } from '../../lib/foro'
+import { listarPublicaciones, misMarcas, cambiarApoyo, reportar, borrarPublicacion, listarModeradores, esDelEquipo } from '../../lib/foro'
 import { useSesion } from '../../lib/sesion'
 import './testimonios.css'
 
@@ -16,6 +16,20 @@ export default function Testimonios() {
   const [publicaciones, setPublicaciones] = useState([])
   const [estado, setEstado] = useState('cargando')
   const [marcas, setMarcas] = useState({ de: null, apoyos: vacio, reportes: vacio })
+  const [moderadores, setModeradores] = useState(vacio)
+
+  useEffect(() => {
+    let activo = true
+    listarModeradores()
+      .then((ids) => activo && setModeradores(ids))
+      .catch(() => {})
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const esEquipo = (userId) => esDelEquipo(userId, moderadores)
+  const soyModerador = Boolean(usuario) && esEquipo(usuario.id)
 
   useEffect(() => {
     let activo = true
@@ -91,6 +105,17 @@ export default function Testimonios() {
     }
   }
 
+  // un moderador del equipo quita una publicacion que no cumple las normas
+  const quitar = async (pub) => {
+    if (!window.confirm('¿Quitar esta publicación porque no cumple las normas del foro? Se borra con sus comentarios.')) return
+    try {
+      await borrarPublicacion(pub.id)
+      setPublicaciones((lista) => lista.filter((p) => p.id !== pub.id))
+    } catch (error) {
+      window.alert(error.message || 'No se pudo quitar.')
+    }
+  }
+
   const cambiarComentarios = (id, cuantos) => editar(id, (p) => ({ n_comentarios: Math.max(p.n_comentarios + cuantos, 0) }))
   const agregarPublicacion = (nueva) => setPublicaciones((lista) => [nueva, ...lista])
 
@@ -119,6 +144,9 @@ export default function Testimonios() {
       onApoyar={alternarApoyo}
       onReportar={reportarFila}
       onBorrar={borrar}
+      onQuitar={quitar}
+      esEquipo={esEquipo}
+      soyModerador={soyModerador}
       onComentario={cambiarComentarios}
       onPublicada={agregarPublicacion}
     />

@@ -113,9 +113,30 @@
 .ramas.anidadas:hover{border-left-color:#8b5cf655}
 .ramas.planas{margin-left:0;padding-left:0;border-left:0}
 
-.ayuda{display:flex;gap:12px;align-items:flex-start;font-size:.85rem;line-height:1.55;color:var(--muted);border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:16px 18px;margin-top:44px}
-.ayuda svg{flex-shrink:0;margin-top:2px;color:var(--b)}
-.ayuda b{color:var(--text);font-weight:500}
+/* normas del foro, etiqueta de equipo y aviso de cuidado antes de publicar */
+.normas-foro{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:12px 16px;margin-bottom:22px;font-size:.9rem}
+.normas-foro summary{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);font-weight:500;list-style:none}
+.normas-foro summary::-webkit-details-marker{display:none}
+.normas-foro summary::after{content:'Ver';margin-left:auto;font-size:.78rem;color:var(--a);font-weight:400}
+.normas-foro[open] summary::after{content:'Ocultar'}
+.normas-foro summary svg{color:var(--b)}
+.normas-foro ol{margin:12px 0 10px 20px;display:grid;gap:6px;color:var(--text)}
+.normas-foro p{font-size:.82rem}
+.equipo{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#0b0b12;background:var(--b);border-radius:999px;padding:2px 8px;font-weight:600;vertical-align:middle;line-height:1.5}
+.autor b+.equipo,.autor-datos .equipo{margin-left:6px}
+.cuidado{display:flex;gap:12px;align-items:flex-start;border:1px solid #22d3ee66;background:#22d3ee0f;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:.88rem}
+.cuidado>svg{flex-shrink:0;color:var(--b);margin-top:2px}
+.cuidado b{display:block;font-weight:500;margin-bottom:4px}
+.cuidado p{color:var(--muted)}
+.cuidado a{color:var(--b)}
+.cuidado .botones{margin-top:10px;flex-wrap:wrap}
+.accion.quitar{color:#fb7185}
+/* reglas para acompanar debajo de la caja de comentarios y ayuda despues de publicar */
+.reglas{display:flex;gap:8px;align-items:flex-start;font-size:.78rem;line-height:1.5;color:var(--muted);margin:0}
+.reglas svg{flex-shrink:0;margin-top:2px;color:var(--b)}
+.reglas a{color:var(--b)}
+.mensaje-ayuda{display:block;margin-top:6px;color:var(--muted);font-size:.85rem}
+.mensaje-ayuda a b{color:var(--text)}
 
 @media(max-width:600px){
 .publicacion,.compositor{padding:16px}

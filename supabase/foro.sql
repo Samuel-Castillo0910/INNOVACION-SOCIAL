@@ -112,6 +112,43 @@ drop trigger if exists contar_reporte on reportes;
 create trigger contar_reporte after insert on reportes
   for each row execute function contar_reporte();
 
+-- moderacion, los mensajes con insultos no se guardan, la pagina revisa lo mismo antes de enviar
+-- el texto se pasa a minuscula, sin tildes, con numeros cambiados por letras y sin letras repetidas tres o mas veces
+-- se puede criticar una norma o un colegio, lo que no pasa son los insultos
+create or replace function texto_permitido(t text)
+returns boolean
+language sql
+immutable
+as $$
+  with limpio as (
+    select regexp_replace(
+      translate(lower(coalesce(t, '')), 'áéíóúüñàèìòùÁÉÍÓÚÜÑ0134@$', 'aeiouunaeiouaeiouunoieaas'),
+      '(.)\1\1+', '\1', 'g'
+    ) as x
+  )
+  select not (
+    x ~ '\m(hijueputas?|hijos? de (su )?puta|h\W?p|jueputa|gonorreas?|malparid[oa]s?|carechimbas?|pirob[oa]s?|(guevon|huevon|webon|huebon|guebon)(a|es|as)?|idiotas?|imbecil(es)?|estupid[oa]s?|pendej[oa]s?|perras?|zorras?|putas?|maricas?|maricon(es)?|mongolic[oa]s?|subnormal(es)?|malnacid[oa]s?)\M'
+    or x ~ '\m(colegio|profes?|profesor(a|es|as)?|rector(a|es|as)?|coordinador(a|es|as)?|directiv[oa]s?|institucion(es)?|monjas?|curas?)\s+(de\s+|(es|era|son|eran)\s+(una?\s+)?)mierda\M'
+  )
+  from limpio
+$$;
+
+-- moderadores, cuentas del equipo que pueden quitar lo que no cumpla las normas
+create table if not exists moderadores (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create or replace function es_moderador()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from moderadores where user_id = auth.uid());
+$$;
+
 -- las funciones de la version anterior ya no se usan
 drop function if exists apoyar_publicacion(uuid, integer);
 drop function if exists reportar_publicacion(uuid);
@@ -124,11 +161,15 @@ grant select on publicaciones, comentarios to anon, authenticated;
 grant insert, delete on publicaciones, comentarios to authenticated;
 grant select, insert, delete on apoyos to authenticated;
 grant select, insert on reportes to authenticated;
+grant select on moderadores to anon, authenticated;
+grant execute on function texto_permitido(text) to anon, authenticated;
+grant execute on function es_moderador() to anon, authenticated;
 
 alter table publicaciones enable row level security;
 alter table comentarios enable row level security;
 alter table apoyos enable row level security;
 alter table reportes enable row level security;
+alter table moderadores enable row level security;
 
 drop policy if exists "leer publicaciones" on publicaciones;
 create policy "leer publicaciones" on publicaciones
@@ -144,11 +185,17 @@ create policy "crear publicaciones" on publicaciones
     and (titulo is null or char_length(titulo) <= 120)
     and (tema is null or char_length(tema) <= 60)
     and (imagen_url is null or imagen_url like '%/storage/v1/object/public/imagenes/%')
+    and texto_permitido(texto) and texto_permitido(titulo)
   );
 
 drop policy if exists "borrar mis publicaciones" on publicaciones;
 create policy "borrar mis publicaciones" on publicaciones
   for delete to authenticated using (user_id = auth.uid());
+
+-- los moderadores pueden quitar publicaciones de la comunidad, nunca los testimonios del formulario
+drop policy if exists "moderar publicaciones" on publicaciones;
+create policy "moderar publicaciones" on publicaciones
+  for delete to authenticated using (fijada = false and es_moderador());
 
 drop policy if exists "leer comentarios" on comentarios;
 create policy "leer comentarios" on comentarios
@@ -161,11 +208,21 @@ create policy "crear comentarios" on comentarios
     and reportes = 0
     and char_length(trim(texto)) between 1 and 2000
     and char_length(alias) between 1 and 40
+    and texto_permitido(texto)
   );
 
 drop policy if exists "borrar mis comentarios" on comentarios;
 create policy "borrar mis comentarios" on comentarios
   for delete to authenticated using (user_id = auth.uid());
+
+drop policy if exists "moderar comentarios" on comentarios;
+create policy "moderar comentarios" on comentarios
+  for delete to authenticated using (es_moderador());
+
+-- cualquiera puede ver quien es moderador, asi la pagina pone la etiqueta de equipo
+drop policy if exists "ver moderadores" on moderadores;
+create policy "ver moderadores" on moderadores
+  for select to anon, authenticated using (true);
 
 drop policy if exists "ver mis apoyos" on apoyos;
 create policy "ver mis apoyos" on apoyos
@@ -200,3 +257,9 @@ drop policy if exists "subir imagenes del foro" on storage.objects;
 create policy "subir imagenes del foro" on storage.objects
   for insert to authenticated
   with check (bucket_id = 'imagenes' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- para volver moderadora una cuenta del equipo, primero se crea en la pagina, luego se cambia el seudonimo aqui
+-- y se corre solo este bloque, quitandole los dos guiones del inicio a cada linea
+-- insert into moderadores (user_id)
+-- select id from auth.users where raw_user_meta_data ->> 'seudonimo' = 'Equipo LOSS OF OTHERNESS'
+-- on conflict do nothing;
