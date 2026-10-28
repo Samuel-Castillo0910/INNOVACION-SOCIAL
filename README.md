@@ -14,7 +14,7 @@ Proyecto de Innovación Social, Universidad EIA.
 
 Los estudiantes de 10° y 11° de colegios privados católicos de Medellín muchas veces reciben etiquetas como "perezoso", "desinteresado" o "problemático", y con el tiempo esas etiquetas se vuelven parte de cómo se ven a sí mismos. La mayoría no tiene un lugar seguro para hablar de eso: en nuestra encuesta, solo 3 de 9 personas sintieron que en el colegio las escuchaban para conocerlas y cuidarlas.
 
-Al revisar manuales de convivencia de colegios de Medellín y Rionegro encontramos que el lenguaje normativo muchas veces juzga a los estudiantes por **atributos** ("desinteresado", "apático", "conflictivo") en lugar de por **conductas**. Cuando un colegio pasa de describir lo que alguien hizo a decidir quién es, se pierde la mirada sobre la persona: eso es lo que llamamos pérdida de la otredad. La encuesta también nos mostró que esto no pasa en todos los casos (6 de 9 personas sintieron que las describían por sus acciones), y por eso enfocamos la página en que nadie cargue solo con una etiqueta.
+Al revisar los manuales de convivencia de tres colegios encontramos normas que juzgan a los estudiantes por **actitudes** o por cómo son ("actitudes que impidan el normal desarrollo de la clase", "influencias negativas") en lugar de por **conductas** concretas. Cuando un colegio pasa de describir lo que alguien hizo a decidir quién es, se pierde la mirada sobre la persona: eso es lo que llamamos pérdida de la otredad. La encuesta también nos mostró que esto no pasa en todos los casos (6 de 9 personas sintieron que las describían por sus acciones), y por eso enfocamos la página en que nadie cargue solo con una etiqueta.
 
 ## Qué busca la página
 
@@ -29,7 +29,7 @@ Al revisar manuales de convivencia de colegios de Medellín y Rionegro encontram
 | --- | --- |
 | **Inicio** | Bienvenida, lo que ofrece la red, tres testimonios ilustrativos y la encuesta. |
 | **Historias** | Los testimonios del formulario, el foro de la comunidad y las líneas de ayuda. |
-| **Hallazgos** | La auditoría de 12 normas de tres manuales de convivencia, los resultados de la encuesta y lo que aprendimos. |
+| **Hallazgos** | La auditoría de 12 normas de tres manuales de convivencia (sin nombrar los colegios), los resultados de la encuesta y lo que aprendimos. |
 | **Docentes y familias** | Resumen sin nombres armado con los datos del foro y cinco ideas para escuchar mejor. Se puede imprimir. |
 | **Misión** | Misión y visión del proyecto. |
 | **Privacidad** | Cómo se protege la identidad de quienes participan. |
